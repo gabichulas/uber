@@ -28,6 +28,23 @@ def createGraph(V,A):
                     graph[k].adjacentvertex.append(A[j][0]) 
     return graph
 
+def createGraphUber(V,A):
+    graph = []
+    if len(V)>0 and len(A)>0:
+        for i in range(0,len(V)):
+            newNode = GraphNode()
+            newNode.vertex = V[i]
+            newNode.adjlist = []
+            graph.append(newNode)
+        
+        for j in range(len(A)):
+            for k in range(len(graph)):
+                if A[j][0] == graph[k].vertex:
+                    graph[k].adjlist.append(A[j][1])
+                elif A[j][1] == graph[k].vertex:
+                    graph[k].adjlist.append(A[j][0]) 
+    return graph
+
 def searchVertex(graph,v):
     for i in range(len(graph)):
         if graph[i].vertex == v:
