@@ -38,3 +38,10 @@ A = map.readline()
 
 E = strToList(E)
 A = strToListofLists(A)
+
+mapa = createGraphUber(E,A)
+
+
+print(E)
+print(A)
+print(mapa[1].adjlist)
