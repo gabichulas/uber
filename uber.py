@@ -14,7 +14,19 @@ class Street:
 def serializationEA(archivo):
     with open(archivo) as file:
         E = file.readline()
-        A = file.readline()  
+        A = file.readline()
+    if '{' in E and '{' in A:      # Cambio del formato de los datos en caso de que sean incompatibles con el algoritmo
+        E = E.replace("{", "[")    # Esto garantiza que los datos sean manipulables de forma fácil en caso de que
+        E = E.replace("}", "]")    # los datos estén estructurados de la forma indicada en el PDF.
+        E = E.replace("e", "")
+        A = A.replace("[", "(")
+        A = A.replace("]", ")")
+        A = A.replace("{", "[")
+        A = A.replace("}", "]")
+        A = A.replace("e", "")
+    with open(archivo, 'w') as fl:
+        fl.write(E)
+        fl.write(A) 
     with open('uber\mapapk.pkl', "wb") as pickle_file:
         pk.dump(E, pickle_file)
         pk.dump(A, pickle_file)
