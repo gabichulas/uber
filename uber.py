@@ -36,5 +36,9 @@ def serializationEA(archivo):
 if sys.argv[1] == "-create_map":
     try:
         map_resultado = serializationEA(sys.argv[2])
-    except IndexError:
+    except IOError:
         print("Parametro no permitido")
+        print("CREACIÓN DEL MAPA FALLIDA.")
+    except SyntaxError:
+        print("El archivo no está permitido. Intente de nuevo.")
+        print("CREACIÓN DEL MAPA FALLIDA.")
