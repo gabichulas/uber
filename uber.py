@@ -6,10 +6,10 @@ from map import createMap
 class GraphNode:
     vertex = None
     adjlist = None
+    inclist = None
+    personDistance = None
+    nearestNode = None
 
-class Street:
-    adjlist = None
-    long = None
 
 def serializationEA(archivo):
     with open(archivo) as file:
@@ -42,3 +42,4 @@ if sys.argv[1] == "-create_map":
     except SyntaxError:
         print("El archivo no está permitido. Intente de nuevo.")
         print("CREACIÓN DEL MAPA FALLIDA.")
+

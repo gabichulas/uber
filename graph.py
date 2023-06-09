@@ -35,14 +35,21 @@ def createGraphUber(V,A):
             newNode = GraphNode()
             newNode.vertex = V[i]
             newNode.adjlist = []
+            newNode.inclist = []
             graph.append(newNode)
         
         for j in range(len(A)):
             for k in range(len(graph)):
                 if A[j][0] == graph[k].vertex:
-                    graph[k].adjlist.append(A[j][1])
+                    list = []
+                    list.append(A[j][1])
+                    list.append(A[j][2])
+                    graph[k].adjlist.append(list)
                 elif A[j][1] == graph[k].vertex:
-                    graph[k].adjlist.append(A[j][0]) 
+                    list = []
+                    list.append(A[j][0])
+                    list.append(A[j][2])
+                    graph[k].inclist.append(list)
     return graph
 
 def searchVertex(graph,v):
