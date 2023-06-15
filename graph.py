@@ -4,7 +4,7 @@ from myqueue import *
 
 class GraphNode:
     vertex = None
-    adjlist = None
+    adjacentvertex = None
     color = None
     parent = None
     distance = None
@@ -17,15 +17,15 @@ def createGraph(V,A):
         for i in range(0,len(V)):
             newNode = GraphNode()
             newNode.vertex = V[i]
-            newNode.adjlist = []
+            newNode.adjacentvertex = []
             graph.append(newNode)
         
         for j in range(len(A)):
             for k in range(len(graph)):
                 if A[j][0] == graph[k].vertex:
-                    graph[k].adjlist.append(A[j][1])
+                    graph[k].adjacentvertex.append(A[j][1])
                 elif A[j][1] == graph[k].vertex:
-                    graph[k].adjlist.append(A[j][0]) 
+                    graph[k].adjacentvertex.append(A[j][0]) 
     return graph
 
 def createGraphUber(V,A):
@@ -67,7 +67,7 @@ def searchVertexIndex(graph,v):
 def numberOfEdges(graph):
     grades = 0
     for i in range(len(graph)):
-        grades += len(graph[i].adjlist)
+        grades += len(graph[i].adjacentvertex)
     return grades/2
 
 def isInList(list,object):
@@ -88,10 +88,10 @@ def existPathR(v2,graph,pivot,list,q):
     if len(pivot.adjlist) > 0:
         list.append(pivot.vertex)
         for adj in range(len(pivot.adjlist)):
-            if pivot.adjlist[adj] == v2.vertex:
+            if pivot.adjlist[adj][0] == v2.vertex:
                 return True
-            elif not isInList(list,pivot.adjlist[adj]):
-                enqueue(q,pivot.adjlist[adj])
+            elif not isInList(list,pivot.adjlist[adj][0]):
+                enqueue(q,pivot.adjlist[adj][0])
         while q.head != None:
             newPivot = searchVertex(graph,dequeue(q))
             newQueue = LinkedList()
@@ -117,7 +117,7 @@ def isTree(graph):
 def isComplete(graph):
     if isConnected(graph):
         for v in graph:
-            if not (len(v.adjlist) == len(graph) - 1):
+            if not (len(v.adjacentvertex) == len(graph) - 1):
                 return False
         return True
     return False
@@ -131,19 +131,19 @@ def convertTree(graph):
         enqueue(cola,graph[i])
         while cola != None:
             currentnode = dequeue(cola)
-            for j in range(0,len(currentnode.adjlist)):
-                if len(currentnode.adjlist) > 0:
-                    if currentnode.adjlist[j] not in visited:
-                        vecino = graph[searchVertexIndex(graph,currentnode.adjlist[j])]
-                        visited.append(currentnode.adjlist[j])
+            for j in range(0,len(currentnode.adjacentvertex)):
+                if len(currentnode.adjacentvertex) > 0:
+                    if currentnode.adjacentvertex[j] not in visited:
+                        vecino = graph[searchVertexIndex(graph,currentnode.adjacentvertex[j])]
+                        visited.append(currentnode.adjacentvertex[j])
                         enqueue(cola,vecino)
                     else:
-                        if searchinq(cola,currentnode.adjlist[j]) == False:
+                        if searchinq(cola,currentnode.adjacentvertex[j]) == False:
                             graphcopy = graph
-                            indexvecino = searchVertexIndex(graph,currentnode.adjlist[j])
+                            indexvecino = searchVertexIndex(graph,currentnode.adjacentvertex[j])
                             indexcurrentnode = searchVertexIndex(graph,currentnode.vertex)
-                            graphcopy[indexcurrentnode].adjlist.remove(currentnode.adjlist[j])
-                            graphcopy[indexvecino].adjlist.remove(currentnode.vertex)
+                            graphcopy[indexcurrentnode].adjacentvertex.remove(currentnode.adjacentvertex[j])
+                            graphcopy[indexvecino].adjacentvertex.remove(currentnode.vertex)
                             if isTree(graphcopy) == True:
                                 tree_edges.append([currentnode.vertex,vecino.vertex])
     return tree_edges    
@@ -167,9 +167,9 @@ def countConnections(graph):
 
 def BFS(graph,node,visited):
     visited.append(node.vertex)
-    for j in range(0,len(node.adjlist)):
-        if node.adjlist[j] not in visited:
-            vecino = searchVertex(graph,node.adjlist[j])
+    for j in range(0,len(node.adjacentvertex)):
+        if node.adjacentvertex[j] not in visited:
+            vecino = searchVertex(graph,node.adjacentvertex[j])
             BFS(graph,vecino,visited)
 
 def convertToBFSTree(graph, v):
@@ -216,13 +216,13 @@ def DFSR(graph,v,dfslist,time):
     adjlist = []
     node = GraphNode()
     node.vertex = v.vertex
-    node.adjlist = adjlist
+    node.adjacentvertex = adjlist
     if v.parent != None:
         adjlist.append(v.parent.vertex)
     time += 1
     v.color = "Grey"
     v.distance = time
-    for i in v.adjlist:
+    for i in v.adjacentvertex:
         neighbor = searchVertex(graph, i)
         if neighbor.color == "White":
             neighbor.parent = v
@@ -231,7 +231,7 @@ def DFSR(graph,v,dfslist,time):
     time += 1
     v.time = time
     v.color = "Black"
-    node.adjlist = adjlist
+    node.adjacentvertex = adjlist
     dfslist.append(node)
 
 def bestRoad(graph,v1,v2):
@@ -245,7 +245,7 @@ def bestRoad(graph,v1,v2):
     while queue.head != None:
         currentnode = dequeue(queue)
         road.append(currentnode.vertex)
-        for j in currentnode.adjlist:
+        for j in currentnode.adjacentvertex:
             neighbor = searchVertex(graph,j)
             if neighbor.vertex == v2.vertex:
                 road.append(v2.vertex)
