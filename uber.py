@@ -7,66 +7,38 @@ class GraphNode:
     vertex = None
     adjlist = None
     inclist = None
-    personDistance = []
-    nearestNode = []
+    personDistance = None
+    nearestNode = None
 
 # Dijkstra uber
 # https://docs.python.org/3/tutorial/datastructures.html
 # https://docs.google.com/presentation/d/17RmIqIXapr5MT4IAtGogUHTNDhalCNlFpQBBlJBlICc/edit?usp=sharing
-# https://youtu.be/nlY-ITslQOg // https://youtu.be/TuANaQb2_Gc
-def searchKeyInList(v, key):
+# https://youtu.be/nlY-ITslQOg // https://youtu.be/TuANaQb2_Gc // https://youtu.be/ClO1hGrA2UY
+def searchKeyIncList(v, key):
     for list in v.inclist: 
         try:
-            if isinstance(list.index(key,0,1), int):    # Devuelve el indice donde esta la key del vertice y lo convierte en valor logico
+            if isinstance(list.index(key,0,1), int):
                 return list
         except:
             pass
-########################################################
-def searchDistanceVertexInList(v, key):
-    for list in v.personDistance:
-        try:
-            if isinstance(list.index(key,0,1), int):    
-                return True
-            else:
-                pass
-        except:
-            pass
-    return False
-#########################################################
 def initRelax(G, s):
     for v in G:
-        list1 = [s.vertex, sys.maxsize]
-        list2 = [s.vertex, sys.maxsize]
-        v.personDistance.append(list1)
-        v.nearestNode.append(list2)
-    list3 = [s.vertex, 0]
-    s.personDistance.append(list3)
-def relax(u, v, s):
-    vInu = searchKeyInList(u, v.vertex)
+        v.personDistance = sys.maxsize
+        v.nearestNode = None
+    s.personDistance = 0
+def relax(u, v):
+    vInu = searchKeyIncList(u, v.vertex)
     if v.personDistance > (u.personDistance + u.inclist[u.inclist.index(vInu)][1]):
         v.personDistance = u.personDistance + u.inclist[u.inclist.index(vInu)][1]
         v.nearestNode = u
-
-        # print("Peso:", v.personDistance)    ##### PRINT DE PRUEBA
-
 def minQueue(G):
     Q = []
     for i in range(0, len(G)):
         Q.append(G[i])
     Q.sort(key=lambda x:x.personDistance)
     return Q
-
 def dijkstra(G, snode):
     initRelax(G, snode)
-
-    print("Nodo1", G[0].personDistance)  ##### PRINT DE PRUEBA
-    print("Nodo2", G[1].personDistance)  ##### PRINT DE PRUEBA
-    print("Nodo3", G[2].personDistance)  ##### PRINT DE PRUEBA
-    print("Nodo4", G[3].personDistance)  ##### PRINT DE PRUEBA
-    print("Nodo5", G[4].personDistance)  ##### PRINT DE PRUEBA
-    print("Nodo6", G[5].personDistance)  ##### PRINT DE PRUEBA
-    print(snode.personDistance,"HUHU")   ##### PRINT DE PRUEBA
-
     S = []
     Q = minQueue(G)
     while len(Q) > 0:
@@ -74,16 +46,46 @@ def dijkstra(G, snode):
         u = Q[0]
         Q.pop(0)
         S.append(u)
-        for v in u.inclist: # Revisar para hacer más legible esto
+        for v in u.inclist:
             if v not in S:
                 for node in G:
                     if v[0] == node.vertex:
                         vnode = node
-                # print("Relajando el nodo:", vnode.vertex) ##### PRINT DE PRUEBA
-                relax(u, vnode, snode)
-        # print("-----") ##### PRINT DE PRUEBA
+                relax(u, vnode)
 
-# Testeos grafo
+# Choose vertex
+def searchKeyAdjList(v, key):
+    for list in v.adjlist: 
+        try:
+            if isinstance(list.index(key,0,1), int):
+                return True
+        except:
+            pass
+    return False
+def chooseVertex(G, value):
+    v = value[0]    # [vertex1, distance1]
+    u = value[1]    # [vertex2, distance2]
+    useV = None
+    useU = None
+    for n in G:
+        if n.vertex == v[0]:
+            if searchKeyAdjList(n, u[0]):
+                useV = n
+        if n.vertex == u[0]:
+            if searchKeyAdjList(n, v[0]):
+                useU = n
+    if useV != None and useU != None:
+        if v[1] > u[1]:
+            return useU
+        else:
+            return useV
+    elif useV != None:
+        return useV
+    else:
+        return useU
+###########################################################
+######################### PRUEBAS #########################
+###########################################################
 node1 = GraphNode()
 node1.vertex = 1
 node2 = GraphNode()
@@ -104,24 +106,46 @@ graph.append(node4)
 graph.append(node5)
 graph.append(node6)
 for v in graph:
+    v.adjlist = []
     v.inclist = []
-node1.inclist.append([2, 8])
+node1.adjlist.append([2, 8])
 node2.inclist.append([1, 8])
-node2.inclist.append([3, 4])
-node2.inclist.append([6, 6])
-node2.inclist.append([4, 6])
-node3.inclist.append([6, 3])
-node4.inclist.append([5, 8])
-node5.inclist.append([6, 4])
+
+node2.adjlist.append([1, 8])
+node1.inclist.append([2, 8])
+
+node2.adjlist.append([3, 4])
+node3.inclist.append([2, 4])
+
+node2.adjlist.append([6, 6])
 node6.inclist.append([2, 6])
+
+node2.adjlist.append([4, 6])
+node4.inclist.append([2, 6])
+
+node3.adjlist.append([6, 3])
+node6.inclist.append([3, 3])
+
+node4.adjlist.append([5, 8])
+node5.inclist.append([4, 8])
+
+node5.adjlist.append([6, 4])
+node6.inclist.append([5, 4])
+
+node6.adjlist.append([2, 6])
+node2.inclist.append([6, 6])
+
 print("----------------------------------------------------------------")
-dijkstra(graph, node1)
-print("Distancia nodo1 al nodo: ", node1.personDistance)
-print("Distancia nodo2 al nodo: ", node2.personDistance)
-print("Distancia nodo3 al nodo: ", node3.personDistance)
-print("Distancia nodo4 al nodo: ", node4.personDistance)
-print("Distancia nodo5 al nodo: ", node5.personDistance)
-print("Distancia nodo6 al nodo: ", node6.personDistance)
-# print("Distancia nodo6 al nodo6: ", node6.personDistance)
-# listaBFS = convertToBFSTree(graph,node1)
-# print(listaBFS)
+# https://drive.google.com/file/d/1dHKOu7D2CIBiNQBIlEqHl_dGt6Q5J2pN/view?usp=sharing
+dijkstra(graph, node3)
+print("Distancia al nodo1: ", node1.personDistance)
+print("Distancia al nodo2: ", node2.personDistance)
+print("Distancia al nodo3: ", node3.personDistance)
+print("Distancia al nodo4: ", node4.personDistance)
+print("Distancia al nodo5: ", node5.personDistance)
+print("Distancia al nodo6: ", node6.personDistance)
+
+# Node1 y Node2, tienen distancia 8
+print(chooseVertex(graph, [[1, 2],[2, 6]]).vertex)
+print(chooseVertex(graph, [[1, 4],[2, 4]]).vertex)
+print(chooseVertex(graph, [[1, 6],[2, 2]]).vertex)
