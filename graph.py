@@ -85,13 +85,13 @@ def existPath(v1,v2,graph):
     return existPathR(vertex2,graph,vertex1,visited,queue)
 
 def existPathR(v2,graph,pivot,list,q):
-    if len(pivot.adjacentvertex) > 0:
+    if len(pivot.adjlist) > 0:
         list.append(pivot.vertex)
-        for adj in range(len(pivot.adjacentvertex)):
-            if pivot.adjacentvertex[adj] == v2.vertex:
+        for adj in range(len(pivot.adjlist)):
+            if pivot.adjlist[adj][0] == v2.vertex:
                 return True
-            elif not isInList(list,pivot.adjacentvertex[adj]):
-                enqueue(q,pivot.adjacentvertex[adj])
+            elif not isInList(list,pivot.adjlist[adj][0]):
+                enqueue(q,pivot.adjlist[adj][0])
         while q.head != None:
             newPivot = searchVertex(graph,dequeue(q))
             newQueue = LinkedList()
