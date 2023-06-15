@@ -173,8 +173,6 @@ def BFS(graph,node,visited):
             BFS(graph,vecino,visited)
 
 def convertToBFSTree(graph, v):
-    if not isConnected(graph):
-        return print("El grafo no es conexo, no se puede aplicar la operacion.")
     for node in graph:
         node.color = "White"
         node.distance = 0
@@ -186,7 +184,7 @@ def convertToBFSTree(graph, v):
     while q.head != None:
         current = dequeue(q)
         adjlist = []
-        for i in current.adjacentvertex:
+        for i in current.adjlist:
             neighbor = searchVertex(graph,i)
             if neighbor.color == "White":
                 adjlist.append(neighbor.vertex)
@@ -196,7 +194,7 @@ def convertToBFSTree(graph, v):
                 enqueue(q,neighbor)
         newNode = GraphNode()
         newNode.vertex = current.vertex
-        newNode.adjacentvertex = adjlist
+        newNode.adjlist = adjlist
         bfslist.append(newNode)
         current.color = "Black"
     return bfslist
