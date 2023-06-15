@@ -1,57 +1,98 @@
 # Proyecto Algoritmos II / 13996 Lopez Gabriel - 14000 Martins Ezequiel
 # Graph Functions
+import sys
+
 class GraphNode:
     vertex = None
     adjlist = None
-    color = None
-    parent = None
+    inclist = None
+    personDistance = None
+    nearestNode = None
 
-# Hashtable Functions // https://planetmath.org/goodhashtableprimes
-# Prime numbers: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61
-# Powers of 2:   2  4   8     16            32                    64 
-class DictionaryElement: # HashFunction (There are 9, H A T S E K I P C, use any prime higher than 9*3=27) // Example: H11 / P6 / C12
-    key = None
-    value = None
-def insert(D, key, value):
-    position = key % 47
-    newElement = DictionaryElement()
-    newElement.key = key
-    newElement.value = value
-    if D[position] == None:
-        D[position] = [newElement]
-    else:
-        D[position].append[newElement]
-    return D
-def search(D, key):
-    position = key % 47
-    element = D[position]
-    if D[position] == None:
-        return None
-    else:
-        for nodo in element:
-            if nodo.key == key:
-                return key
-        return None
+# Dijkstra
+# https://docs.python.org/3/tutorial/datastructures.html
+# https://docs.google.com/presentation/d/17RmIqIXapr5MT4IAtGogUHTNDhalCNlFpQBBlJBlICc/edit?usp=sharing
+# https://youtu.be/nlY-ITslQOg // https://youtu.be/TuANaQb2_Gc
+# CAMBIAR TODOS LOS ADJLIST POR INCLIST PARA QUE FUNCIONE LA BUSQUEDA DE DISTANCIA
+def searchKeyInList(v, key):
+    for list in v.adjlist: # Buscar en la lista adjlist
+        try:
+            if isinstance(list.index(key,0,1), int):    # Devuelve el indice donde esta la key del vertice y lo convierte en valor logico
+                return list
+        except:
+            pass
+def initRelax(G, s):    # Revisar que arranque
+    for v in G:     # Por cada vertice del grafo
+        v.personDistance = sys.maxsize
+        v.nearestNode = None
+    s.personDistance = 0
+def relax(u, v):
+    vInu = searchKeyInList(u, v.vertex)
+    if v.personDistance > (u.personDistance + u.adjlist[u.adjlist.index(vInu)][1]):
+        v.personDistance = u.personDistance + u.adjlist[u.adjlist.index(vInu)][1]
+        v.nearestNode = u
+        # print("Peso:", v.personDistance)    ##### PRINT DE PRUEBA
+def minQueue(G):        # REVISAR QUE ESTA FUNCIÓN FUNCIONA // https://youtu.be/ClO1hGrA2UY
+    Q = []
+    for i in range(0, len(G)):
+        Q.append(G[i])
+    Q.sort(key=lambda x:x.personDistance)
+    return Q
 
-# Add locations to a Hashtable
-def createLocations(LocationList):
-    dictionary = DictionaryElement()
-    return createLocationsR(LocationList, dictionary)
-def createLocationsR(LL, D):
-    if LL == []:
-        return D
-    key = ord(LL[0][0][0:1]) + LL[0][0][1:len(LL[0][0])]    # Change for better management
-    value = LL[0][1]                                        # '' '' '' '' '' '' '' '' '' ''
-    insert(D, key, value)
-    LL = LL.pop(0)
-    createLocationsR(LL, D)
+def dijkstra(G, snode):  # Dijkstra REVISAR Y VER SI FUNCIONA
+    initRelax(G, snode)
+    S = []
+    Q = minQueue(G)
+    while len(Q) > 0:
+        Q = minQueue(Q)
+        u = Q[0]
+        Q.pop(0)
+        S.append(u)
+        for v in u.adjlist: # Revisar para hacer más legible esto
+            if v not in S:
+                for node in G:
+                    if v[0] == node.vertex:
+                        vnode = node
+                # print("Relajando el nodo:", vnode.vertex) ##### PRINT DE PRUEBA
+                relax(u, vnode)
+        # print("-----") ##### PRINT DE PRUEBA
 
-# Pruebas del Hash
-key = "A24"
-print("La A vale en ASCII: ", ord(key[0:1]))
-print("El valor del key es: ", ord(key[0:1])+int(key[1:len(key)]))
-print("Tras el HashFunction: ", (ord(key[0:1])+int(key[1:len(key)]))%47)
-
-# Basic Functions
-def selectNode(node):
-    a = 0
+# Testeos grafo
+node1 = GraphNode()
+node1.vertex = 1
+node2 = GraphNode()
+node2.vertex = 2
+node3 = GraphNode()
+node3.vertex = 3
+node4 = GraphNode()
+node4.vertex = 4
+node5 = GraphNode()
+node5.vertex = 5
+node6 = GraphNode()
+node6.vertex = 6
+graph = []
+graph.append(node1) # Añadir nodos al grafo
+graph.append(node2)
+graph.append(node3)
+graph.append(node4)
+graph.append(node5)
+graph.append(node6)
+for v in graph:
+    v.adjlist = []
+node1.adjlist.append([2, 8])
+node2.adjlist.append([1, 8])
+node2.adjlist.append([3, 4])
+node2.adjlist.append([6, 6])
+node2.adjlist.append([4, 6])
+node3.adjlist.append([6, 3])
+node4.adjlist.append([5, 8])
+node5.adjlist.append([6, 4])
+node6.adjlist.append([2, 6])
+dijkstra(graph, node1)
+print("Distancia nodo1 al nodo: ", node1.personDistance)
+print("Distancia nodo2 al nodo: ", node2.personDistance)
+print("Distancia nodo3 al nodo: ", node3.personDistance)
+print("Distancia nodo4 al nodo: ", node4.personDistance)
+print("Distancia nodo5 al nodo: ", node5.personDistance)
+print("Distancia nodo6 al nodo: ", node6.personDistance)
+# print("Distancia nodo6 al nodo6: ", node6.personDistance)
