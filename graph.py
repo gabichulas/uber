@@ -85,13 +85,13 @@ def existPath(v1,v2,graph):
     return existPathR(vertex2,graph,vertex1,visited,queue)
 
 def existPathR(v2,graph,pivot,list,q):
-    if len(pivot.adjacentvertex) > 0:
+    if len(pivot.adjlist) > 0:
         list.append(pivot.vertex)
-        for adj in range(len(pivot.adjacentvertex)):
-            if pivot.adjacentvertex[adj] == v2.vertex:
+        for adj in range(len(pivot.adjlist)):
+            if pivot.adjlist[adj][0] == v2.vertex:
                 return True
-            elif not isInList(list,pivot.adjacentvertex[adj]):
-                enqueue(q,pivot.adjacentvertex[adj])
+            elif not isInList(list,pivot.adjlist[adj][0]):
+                enqueue(q,pivot.adjlist[adj][0])
         while q.head != None:
             newPivot = searchVertex(graph,dequeue(q))
             newQueue = LinkedList()
@@ -173,8 +173,6 @@ def BFS(graph,node,visited):
             BFS(graph,vecino,visited)
 
 def convertToBFSTree(graph, v):
-    if not isConnected(graph):
-        return print("El grafo no es conexo, no se puede aplicar la operacion.")
     for node in graph:
         node.color = "White"
         node.distance = 0
@@ -186,7 +184,7 @@ def convertToBFSTree(graph, v):
     while q.head != None:
         current = dequeue(q)
         adjlist = []
-        for i in current.adjacentvertex:
+        for i in current.adjlist:
             neighbor = searchVertex(graph,i)
             if neighbor.color == "White":
                 adjlist.append(neighbor.vertex)
@@ -196,7 +194,7 @@ def convertToBFSTree(graph, v):
                 enqueue(q,neighbor)
         newNode = GraphNode()
         newNode.vertex = current.vertex
-        newNode.adjacentvertex = adjlist
+        newNode.adjlist = adjlist
         bfslist.append(newNode)
         current.color = "Black"
     return bfslist

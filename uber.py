@@ -9,6 +9,7 @@ from map import createMap
 # Powers of 2:   2  4   8     16            32                    64 
 
 ubiPickle = "pk_ubicaciones.pkl"
+ubiMovPickle = "pk_ubicaciones_mov.pkl"
 mapPickle = "mapapk.pkl"
 
 class GraphNode:
@@ -24,14 +25,14 @@ class DictionaryElement: # HashFunction (There are 9, H A T S E K I P C, use any
     monto = None
 
 def loadHash(D):
-    for i in range(0,47):
+    for i in range(0,7):
         D.append([])
     return D
 
 def insert(D, key, value, monto):
     if D == []:
         loadHash(D)
-    position = key % 47
+    position = ord(key[0]) % 7
     newElement = DictionaryElement()
     newElement.key = key
     newElement.value = value
@@ -41,14 +42,14 @@ def insert(D, key, value, monto):
     return D
 
 def search(D, key):
-    position = key % 47
+    position = ord(key[0]) % 7
     element = D[position]
     if D[position] == None:
         return None
     else:
         for nodo in element:
             if nodo.key == key:
-                return key
+                return nodo
         return None
 
 # Add locations to a Hashtable
@@ -68,10 +69,12 @@ def createLocationsR(LL, D):
 def createLocationNotExisting(L, D):
     if L == []:
         return D
-    key = ord(L[0][0:1]) + int(L[0][1:len(L[0])])
+    key = L[0]
     value = L[1] 
-    if L[2] != None:
-        monto = int(L[2])                                    
+    if len(L) > 2:
+        monto = int(L[2])
+    else:
+        monto = None                                 
     insert(D, key, value,monto)
     return D
 
@@ -111,6 +114,15 @@ def deserializate(archivo,dict):
         dict = pk.load(file)
     return dict
 
+def existPathUber(v,u,hash1,hash2,map):
+    v = search(hash1,str(v))
+    u = search(hash2,str(u))
+    if existPath(v.value[1][0],u.value[0][0],map): return True
+    elif existPath(v.value[0][0],u.value[1][0],map): return True
+    elif existPath(v.value[1][0],u.value[1][0],map): return True
+    elif existPath(v.value[0][0],u.value[1][0],map): return True
+    else: return False
+
 def emptyfile(archivo):
     with open(archivo, 'rb') as file:
         if file.readline() == None:
@@ -129,8 +141,18 @@ def createFD(nombre, direccion, hash):
     hash = createLocationNotExisting(dir,hash)
     return hash
 
-def createMD(nombre):
-    return
+def createMD(nombre, direccion, monto, hash):
+    direccion = direccion.replace("<", "(")
+    direccion = direccion.replace(">" , ")")
+    direccion = direccion.replace(" ", ",")
+    direccion = direccion.replace("e", "")
+    direccion = eval(direccion)
+    dir = []
+    dir.append(str(nombre))
+    dir.append(direccion)
+    dir.append(monto)
+    hash = createLocationNotExisting(dir,hash)
+    return hash
 
 if sys.argv[1] == "-create_map":
     try:
@@ -166,7 +188,11 @@ if sys.argv[1] == "-load_fix_element":
             else:
                 if not emptyfile(ubiPickle):
                     ubicaciones = deserializate(ubiPickle,ubicaciones)
-            old = ubicaciones
+            for nodes in ubicaciones:
+                for element in nodes:
+                    if element.key == str(sys.argv[2]):
+                        print("La ubicación ya existe. Intenta dándole otro nombre.")
+                        exit()
             ubicaciones = createFD(sys.argv[2], sys.argv[3],ubicaciones)
             serializationL(ubiPickle, ubicaciones)
             print("La ubicacion ha sido agregada.")
@@ -184,16 +210,45 @@ if sys.argv[1] == "-load_movil_element":
         else:
             map = createMap(mapPickle)
             ubicaciones = [] 
-            if not os.path.exists(ubiPickle):
-                with open(ubiPickle, "wb") as ubis:
+            if not os.path.exists(ubiMovPickle):
+                with open(ubiMovPickle, "wb") as ubis:
                     print("")
             else:
-                if not emptyfile(ubiPickle):
-                    ubicaciones = deserializate(ubiPickle,ubicaciones)
-            old = ubicaciones
-            ubicaciones = createFD(sys.argv[2], sys.argv[3],ubicaciones)
-            serializationL(ubiPickle, ubicaciones)
+                if not emptyfile(ubiMovPickle):
+                    ubicaciones = deserializate(ubiMovPickle,ubicaciones)
+            for nodes in ubicaciones:
+                for element in nodes:
+                    if element.key == str(sys.argv[2]):
+                        print("La ubicación ya existe. Intenta dándole otro nombre.")
+                        exit()
+            ubicaciones = createMD(sys.argv[2], sys.argv[3], sys.argv[4],ubicaciones)
+            serializationL(ubiMovPickle, ubicaciones)
             print("La ubicacion ha sido agregada.")
+    except IOError:
+        print("Parametro no permitido")
+        print("CREACIÓN DE DIRECCION FALLIDA")
+    except SyntaxError:
+        print("El archivo no está permitido. Intente de nuevo.")
+        print("CREACIÓN DE DIRECCION FALLIDA")
+
+
+if sys.argv[1] == "-create_trip":
+    try:
+        if not os.path.exists(mapPickle):
+            print("ERROR. No hay un mapa cargado. Intenta de nuevo.")
+        elif not os.path.exists(ubiMovPickle):
+            print("ERROR. Por favor, carga ubicaciones moviles.")
+        elif not os.path.exists(ubiPickle):
+            print("ERROR. Por favor, carga ubicaciones fijas.")
+        else:
+            map = createMap(mapPickle)
+            ubiF = []
+            ubiM = []
+            with open(ubiPickle, "rb") as ubis:
+                ubiF = deserializate(ubiPickle, ubiF)
+            with open(ubiMovPickle, "rb") as ubisM:
+                ubiM = deserializate(ubiMovPickle, ubiM)
+            print(existPathUber(sys.argv[2], sys.argv[3], ubiM, ubiF,map))
     except IOError:
         print("Parametro no permitido")
         print("CREACIÓN DE DIRECCION FALLIDA")
