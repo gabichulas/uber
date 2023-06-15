@@ -8,7 +8,8 @@ from map import createMap
 # Prime numbers: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61
 # Powers of 2:   2  4   8     16            32                    64 
 
-ubiPickle = "uber\pk_ubicaciones.pkl"
+ubiPickle = "pk_ubicaciones.pkl"
+mapPickle = "mapapk.pkl"
 
 class GraphNode:
     vertex = None
@@ -20,19 +21,22 @@ class GraphNode:
 class DictionaryElement: # HashFunction (There are 9, H A T S E K I P C, use any prime higher than 9*3=27) // Example: H11 / P6 / C12
     key = None
     value = None
+    monto = None
 
 def loadHash(D):
     for i in range(0,47):
         D.append([])
     return D
 
-def insert(D, key, value):
+def insert(D, key, value, monto):
     if D == []:
         loadHash(D)
     position = key % 47
     newElement = DictionaryElement()
     newElement.key = key
     newElement.value = value
+    if monto != None:
+        newElement.monto = monto
     D[position].append(newElement)
     return D
 
@@ -65,8 +69,10 @@ def createLocationNotExisting(L, D):
     if L == []:
         return D
     key = ord(L[0][0:1]) + int(L[0][1:len(L[0])])
-    value = L[1]                                       
-    insert(D, key, value)
+    value = L[1] 
+    if L[2] != None:
+        monto = int(L[2])                                    
+    insert(D, key, value,monto)
     return D
 
 
@@ -90,10 +96,10 @@ def serializationEA(archivo):
     with open(archivo, 'w') as fl:
         fl.write(E)
         fl.write(A) 
-    with open('uber\mapapk.pkl', "wb") as pickle_file:
+    with open(mapPickle, "wb") as pickle_file:
         pk.dump(E, pickle_file)
         pk.dump(A, pickle_file)
-    mapa_creado = createMap('uber\mapapk.pkl')
+    mapa_creado = createMap(mapPickle)
     return mapa_creado
 
 def serializationL(archivo,dict):
@@ -123,10 +129,12 @@ def createFD(nombre, direccion, hash):
     hash = createLocationNotExisting(dir,hash)
     return hash
 
+def createMD(nombre):
+    return
 
 if sys.argv[1] == "-create_map":
     try:
-        if os.path.exists("uber\mapapk.pkl"):
+        if os.path.exists(mapPickle):
             print("Ya hay un mapa creado!. Estas seguro de que queres crear otro? Esto puede ocasionar fallas al cargar direcciones incompatibles.")
             decision = input("Y/N: ")
             if decision == "Y".lower(): 
@@ -147,10 +155,10 @@ if sys.argv[1] == "-create_map":
 
 if sys.argv[1] == "-load_fix_element":
     try:
-        if not os.path.exists("uber\mapapk.pkl"):
+        if not os.path.exists(mapPickle):
             print("ERROR. No hay un mapa cargado. Intenta de nuevo.")
         else:
-            map = createMap("uber\mapapk.pkl")
+            map = createMap(mapPickle)
             ubicaciones = [] 
             if not os.path.exists(ubiPickle):
                 with open(ubiPickle, "wb") as ubis:
@@ -169,3 +177,26 @@ if sys.argv[1] == "-load_fix_element":
         print("El archivo no está permitido. Intente de nuevo.")
         print("CREACIÓN DE DIRECCION FALLIDA")
 
+if sys.argv[1] == "-load_movil_element":
+    try:
+        if not os.path.exists(mapPickle):
+            print("ERROR. No hay un mapa cargado. Intenta de nuevo.")
+        else:
+            map = createMap(mapPickle)
+            ubicaciones = [] 
+            if not os.path.exists(ubiPickle):
+                with open(ubiPickle, "wb") as ubis:
+                    print("")
+            else:
+                if not emptyfile(ubiPickle):
+                    ubicaciones = deserializate(ubiPickle,ubicaciones)
+            old = ubicaciones
+            ubicaciones = createFD(sys.argv[2], sys.argv[3],ubicaciones)
+            serializationL(ubiPickle, ubicaciones)
+            print("La ubicacion ha sido agregada.")
+    except IOError:
+        print("Parametro no permitido")
+        print("CREACIÓN DE DIRECCION FALLIDA")
+    except SyntaxError:
+        print("El archivo no está permitido. Intente de nuevo.")
+        print("CREACIÓN DE DIRECCION FALLIDA")
