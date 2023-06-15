@@ -52,20 +52,6 @@ def search(D, key):
                 return nodo
         return None
 
-# Add locations to a Hashtable
-def createLocations(LocationList):
-    dictionary = DictionaryElement()
-    return createLocationsR(LocationList, dictionary)
-
-def createLocationsR(LL, D):
-    if LL == []:
-        return D
-    key = ord(LL[0][0][0:1]) + LL[0][0][1:len(LL[0][0])]    # Change for better management
-    value = LL[0][1]                                        # '' '' '' '' '' '' '' '' '' ''
-    insert(D, key, value)
-    LL = LL.pop(0)
-    createLocationsR(LL, D)
-
 def createLocationNotExisting(L, D):
     if L == []:
         return D
@@ -237,6 +223,41 @@ def chooseVertex(G, value, variant): # variant debe ser 0 para Dijkstra o 1 para
         else:
             return useV
 
+def interface(persona, direccion, ranking, map, ubiF, ubiM):
+    print("-------------------- * --------------------\n")
+    print(f"---------- Bienvenido {persona}. ----------\n")
+    print("------- Este es el ranking de sus autos mas cercanos: -------")
+    ######
+    choose = str(input("Por favor, elija el auto que prefiera: ")).upper()
+    while True:
+        if choose in ranking:
+            auto = choose
+            break
+        else:
+            choose = str(input("El auto que eligio no existe. Intente de nuevo: ")).upper()
+    print(f"\nFelicidades! usted ha elegido el vehiculo {auto}.")
+    choose1 = str(input("¿Acepta el viaje?\nY/N: ")).lower()
+    while choose1 != "y" and choose1 != "n":
+        choose1 = str(input("Respuesta invalida. Intente de nuevo.\nY/N: ")).lower()
+    if choose1 == "n":
+        print("Gracias por viajar con nosotros!")
+    
+
+def calculateDistance(graph, carList, person):
+    distanceCarList = []
+    nodeP = chooseVertex(graph, person.value, 0)
+    for list in person.value:
+            if list[0] == nodeP.vertex:
+                distanceCar = list[1]
+    for listx in carList: # list[0] key, list[1] distancia
+        nodeC = chooseVertex(graph, listx.value, 0)
+        for lista in listx.value:
+            if lista[0] == nodeC.vertex:
+                distanceCar = distanceCar + nodeC.personDistance + lista[1]
+        distanceCarList.append(list[0], distanceCar)
+    return distanceCarList
+
+
 if sys.argv[1] == "-create_map":
     try:
         if os.path.exists(mapPickle):
@@ -331,7 +352,11 @@ if sys.argv[1] == "-create_trip":
                 ubiF = deserializate(ubiPickle, ubiF)
             with open(ubiMovPickle, "rb") as ubisM:
                 ubiM = deserializate(ubiMovPickle, ubiM)
-            print(existPathUber(sys.argv[2], sys.argv[3], ubiM, ubiF,map))
+            if existPathUber(sys.argv[2], sys.argv[3], ubiM, ubiF,map):
+                calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, "P1"))
+                rank = ['c2']
+                interface(sys.argv[2], sys.argv[3], rank, None,None,None)
+
     except IOError:
         print("Parametro no permitido")
         print("CREACIÓN DE DIRECCION FALLIDA")
