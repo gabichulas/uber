@@ -2,6 +2,7 @@ from graph import *
 import pickle as pk
 import sys
 import os
+from random import *
 from map import createMap
 
 # Hashtable Functions // https://planetmath.org/goodhashtableprimes
@@ -116,11 +117,12 @@ def emptyfile(archivo):
     return False
 
 def createFD(nombre, direccion, hash):
-    direccion = direccion.replace("<", "(")
-    direccion = direccion.replace(">" , ")")
-    direccion = direccion.replace(" ", ",")
-    direccion = direccion.replace("e", "")
-    direccion = eval(direccion)
+    if '<' in direccion:
+        direccion = direccion.replace("<", "(")
+        direccion = direccion.replace(">" , ")")
+        direccion = direccion.replace(" ", ",")
+        direccion = direccion.replace("e", "")
+        direccion = eval(direccion)
     dir = []
     dir.append(str(nombre))
     dir.append(direccion)
@@ -255,11 +257,14 @@ def interface(persona, direccion, ranking, map, ubiF, ubiM):
     elif choose1 == "y":
         car = search(ubiM,auto)
         person = search(ubiM, persona)
-        if direccion[0] != "<":  
-            destino = search(ubiF, direccion).value
-            person.value = destino
-            person.monto = person.monto - (car.monto+ranking[var][1])/4
-            car.value = destino
+        destino = search(ubiF, direccion).value
+        person.value = destino
+        person.monto = person.monto - (car.monto+ranking[var][1])/4
+        car.value = destino
+        print(f"Gracias por viajar con nosotros! Su nuevo monto es: {person.monto}")
+
+
+
 
 
 def calculateDistance(graph, carList, person):
@@ -371,12 +376,26 @@ if sys.argv[1] == "-create_trip":
                 ubiF = deserializate(ubiPickle, ubiF)
             with open(ubiMovPickle, "rb") as ubisM:
                 ubiM = deserializate(ubiMovPickle, ubiM)
-            if existPathUber(sys.argv[2], sys.argv[3], ubiM, ubiF,map):
-                dijkstra(map, chooseVertex(map, search(ubiM, sys.argv[2]).value,0))
-                distance = calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, sys.argv[2]))
-                carRanking = sorted(distance, key=lambda x:x[1])
-                carRanking = calculatePrice(sys.argv[2], carRanking, ubiM)
-                interface(sys.argv[2], sys.argv[3], carRanking, map,ubiF,ubiM)
+            if sys.argv[3][0] == "<":
+                sys.argv[3] = sys.argv[3].replace("<", "(")
+                sys.argv[3] = sys.argv[3].replace(">", ")")
+                sys.argv[3] = sys.argv[3].replace("e", "")
+                sys.argv[3] = sys.argv[3].replace(" ", ",")
+                sys.argv[3] = eval(sys.argv[3])
+                newDirection = createFD("X1",sys.argv[3],ubiF)
+                if existPathUber(sys.argv[2],newDirection[ord("X")%7][0].key, ubiM, ubiF,map):
+                    dijkstra(map, chooseVertex(map, search(ubiM, sys.argv[2]).value,0))
+                    distance = calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, sys.argv[2]))
+                    carRanking = sorted(distance, key=lambda x:x[1])
+                    carRanking = calculatePrice(sys.argv[2], carRanking, ubiM)
+                    interface(sys.argv[2], "X1", carRanking, map,ubiF,ubiM)
+            else:
+                if existPathUber(sys.argv[2], sys.argv[3], ubiM, ubiF,map):
+                    dijkstra(map, chooseVertex(map, search(ubiM, sys.argv[2]).value,0))
+                    distance = calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, sys.argv[2]))
+                    carRanking = sorted(distance, key=lambda x:x[1])
+                    carRanking = calculatePrice(sys.argv[2], carRanking, ubiM)
+                    interface(sys.argv[2], sys.argv[3], carRanking, map,ubiF,ubiM)
 
     except IOError:
         print("Parametro no permitido")
