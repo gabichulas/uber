@@ -254,7 +254,7 @@ def calculateDistance(graph, carList, person):
         for lista in listx.value:
             if lista[0] == nodeC.vertex:
                 distanceCar = distanceCar + nodeC.personDistance + lista[1]
-        distanceCarList.append(list[0], distanceCar)
+        distanceCarList.append([list[0], distanceCar])
     return distanceCarList
 
 
@@ -353,7 +353,9 @@ if sys.argv[1] == "-create_trip":
             with open(ubiMovPickle, "rb") as ubisM:
                 ubiM = deserializate(ubiMovPickle, ubiM)
             if existPathUber(sys.argv[2], sys.argv[3], ubiM, ubiF,map):
-                calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, "P1"))
+                dijkstra(map, chooseVertex(map, search(ubiM, sys.argv[2]).value,0))
+                distance = calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, sys.argv[2]))
+                print(distance)
                 rank = ['c2']
                 interface(sys.argv[2], sys.argv[3], rank, None,None,None)
 
