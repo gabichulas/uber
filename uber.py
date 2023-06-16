@@ -223,28 +223,44 @@ def chooseVertex(G, value, variant): # variant debe ser 0 para Dijkstra o 1 para
         else:
             return useV
 
+def calculatePrice(persona,autos,ubiM):
+    persona = search(ubiM, persona)
+    for node in autos:
+        if (search(ubiM,node[0]).monto+node[1])/4 > persona.monto:
+            autos.pop(node)
+    return autos
+
+
+def decision(rank,var):
+    choose = str(input("Por favor, elija el auto que prefiera: ")).upper()
+    for i in range(0,len(rank)):
+            if rank[i][0].upper() == choose:
+                var = i
+                return choose, var
+    return decision(rank, var)
+
 def interface(persona, direccion, ranking, map, ubiF, ubiM):
+    var = 0
     print("-------------------- * --------------------\n")
     print(f"---------- Bienvenido {persona}. ----------\n")
     print("------- Este es el ranking de sus autos mas cercanos: -------")
     print(ranking)
-    choose = str(input("Por favor, elija el auto que prefiera: ")).upper()
-    while True:
-        for node in ranking:
-            if node[0].upper() == choose:
-                auto = choose
-                break
-        choose = str(input("El auto que eligio no existe. Intente de nuevo: ")).upper()
-        node = None
-        break
-    
+    auto, var = decision(ranking,var)
     print(f"\nFelicidades! usted ha elegido el vehiculo {auto}.")
     choose1 = str(input("¿Acepta el viaje?\nY/N: ")).lower()
     while choose1 != "y" and choose1 != "n":
         choose1 = str(input("Respuesta invalida. Intente de nuevo.\nY/N: ")).lower()
     if choose1 == "n":
         print("Gracias por viajar con nosotros!")
-    
+    elif choose1 == "y":
+        car = search(ubiM,auto)
+        person = search(ubiM, persona)
+        if direccion[0] != "<":  
+            destino = search(ubiF, direccion).value
+            person.value = destino
+            person.monto = person.monto - (car.monto+ranking[var][1])/4
+            car.value = destino
+
 
 def calculateDistance(graph, carList, person):
     distanceCarList = []
@@ -359,7 +375,8 @@ if sys.argv[1] == "-create_trip":
                 dijkstra(map, chooseVertex(map, search(ubiM, sys.argv[2]).value,0))
                 distance = calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, sys.argv[2]))
                 carRanking = sorted(distance, key=lambda x:x[1])
-                interface(sys.argv[2], sys.argv[3], carRanking, None,None,None)
+                carRanking = calculatePrice(sys.argv[2], carRanking, ubiM)
+                interface(sys.argv[2], sys.argv[3], carRanking, map,ubiF,ubiM)
 
     except IOError:
         print("Parametro no permitido")
