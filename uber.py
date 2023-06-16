@@ -227,14 +227,17 @@ def interface(persona, direccion, ranking, map, ubiF, ubiM):
     print("-------------------- * --------------------\n")
     print(f"---------- Bienvenido {persona}. ----------\n")
     print("------- Este es el ranking de sus autos mas cercanos: -------")
-    ######
+    print(ranking)
     choose = str(input("Por favor, elija el auto que prefiera: ")).upper()
     while True:
-        if choose in ranking:
-            auto = choose
-            break
-        else:
-            choose = str(input("El auto que eligio no existe. Intente de nuevo: ")).upper()
+        for node in ranking:
+            if node[0].upper() == choose:
+                auto = choose
+                break
+        choose = str(input("El auto que eligio no existe. Intente de nuevo: ")).upper()
+        node = None
+        break
+    
     print(f"\nFelicidades! usted ha elegido el vehiculo {auto}.")
     choose1 = str(input("¿Acepta el viaje?\nY/N: ")).lower()
     while choose1 != "y" and choose1 != "n":
@@ -254,7 +257,7 @@ def calculateDistance(graph, carList, person):
         for lista in listx.value:
             if lista[0] == nodeC.vertex:
                 distanceCar = distanceCar + nodeC.personDistance + lista[1]
-        distanceCarList.append([list[0], distanceCar])
+        distanceCarList.append([listx.key, distanceCar])
     return distanceCarList
 
 
@@ -355,9 +358,8 @@ if sys.argv[1] == "-create_trip":
             if existPathUber(sys.argv[2], sys.argv[3], ubiM, ubiF,map):
                 dijkstra(map, chooseVertex(map, search(ubiM, sys.argv[2]).value,0))
                 distance = calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, sys.argv[2]))
-                print(distance)
-                rank = ['c2']
-                interface(sys.argv[2], sys.argv[3], rank, None,None,None)
+                carRanking = sorted(distance, key=lambda x:x[1])
+                interface(sys.argv[2], sys.argv[3], carRanking, None,None,None)
 
     except IOError:
         print("Parametro no permitido")
