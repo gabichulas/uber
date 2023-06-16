@@ -241,12 +241,14 @@ def decision(rank,var):
                 return choose, var
     return decision(rank, var)
 
-def interface(persona, direccion, ranking, map, ubiF, ubiM):
+def interface(persona, direccion, ranking, ubiF, ubiM):
     var = 0
     print("-------------------- * --------------------\n")
     print(f"---------- Bienvenido {persona}. ----------\n")
     print("------- Este es el ranking de sus autos mas cercanos: -------")
-    print(ranking)
+    ranking = ranking[0:3]
+    for i in ranking:
+        print(f"El auto {i[0]} se encuentra a {i[1]} metros de usted.")
     auto, var = decision(ranking,var)
     print(f"\nFelicidades! usted ha elegido el vehiculo {auto}.")
     choose1 = str(input("¿Acepta el viaje?\nY/N: ")).lower()
@@ -388,14 +390,14 @@ if sys.argv[1] == "-create_trip":
                     distance = calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, sys.argv[2]))
                     carRanking = sorted(distance, key=lambda x:x[1])
                     carRanking = calculatePrice(sys.argv[2], carRanking, ubiM)
-                    interface(sys.argv[2], "X1", carRanking, map,ubiF,ubiM)
+                    interface(sys.argv[2], "X1", carRanking,ubiF,ubiM)
             else:
                 if existPathUber(sys.argv[2], sys.argv[3], ubiM, ubiF,map):
                     dijkstra(map, chooseVertex(map, search(ubiM, sys.argv[2]).value,0))
                     distance = calculateDistance(map, ubiM[ord("C") % 7], search(ubiM, sys.argv[2]))
                     carRanking = sorted(distance, key=lambda x:x[1])
                     carRanking = calculatePrice(sys.argv[2], carRanking, ubiM)
-                    interface(sys.argv[2], sys.argv[3], carRanking, map,ubiF,ubiM)
+                    interface(sys.argv[2], sys.argv[3], carRanking,ubiF,ubiM)
 
     except IOError:
         print("Parametro no permitido")
