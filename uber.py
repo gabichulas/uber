@@ -191,7 +191,7 @@ def searchKeyAdjList(v, key):
         except:
             pass
     return False
-def chooseVertex(G, value, variant): # variant debe ser 0 para Dijkstra o 1 para BFS
+def chooseVertex(G, value, variant): # variant debe ser 0 para llegada o 1 para salida
     v = value[0]    # [vertex1, distance1]
     u = value[1]    # [vertex2, distance2]
     useV = None
