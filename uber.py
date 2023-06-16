@@ -312,9 +312,8 @@ if sys.argv[1] == "-load_fix_element":
         else:
             map = createMap(mapPickle)
             ubicaciones = [] 
-            if not os.path.exists(ubiPickle):
-                with open(ubiPickle, "wb") as ubis:
-                    print("")
+            if not os.path.exists(ubiPickle) :
+                print("")
             else:
                 if not emptyfile(ubiPickle):
                     ubicaciones = deserializate(ubiPickle,ubicaciones)
@@ -323,9 +322,13 @@ if sys.argv[1] == "-load_fix_element":
                     if element.key == str(sys.argv[2]):
                         print("La ubicación ya existe. Intenta dándole otro nombre.")
                         exit()
-            ubicaciones = createFD(sys.argv[2], sys.argv[3],ubicaciones)
-            serializationL(ubiPickle, ubicaciones)
-            print("La ubicacion ha sido agregada.")
+            if sys.argv[3][0] == "<":
+                ubicaciones = createFD(sys.argv[2], sys.argv[3],ubicaciones)
+                serializationL(ubiPickle, ubicaciones)
+                print("La ubicacion ha sido agregada.")
+            else:
+                print("Parametro no permitido")
+                print("CREACIÓN DE DIRECCION FALLIDA")
     except IOError:
         print("Parametro no permitido")
         print("CREACIÓN DE DIRECCION FALLIDA")
@@ -341,8 +344,7 @@ if sys.argv[1] == "-load_movil_element":
             map = createMap(mapPickle)
             ubicaciones = [] 
             if not os.path.exists(ubiMovPickle):
-                with open(ubiMovPickle, "wb") as ubis:
-                    print("")
+                print("")
             else:
                 if not emptyfile(ubiMovPickle):
                     ubicaciones = deserializate(ubiMovPickle,ubicaciones)
@@ -351,9 +353,13 @@ if sys.argv[1] == "-load_movil_element":
                     if element.key == str(sys.argv[2]):
                         print("La ubicación ya existe. Intenta dándole otro nombre.")
                         exit()
-            ubicaciones = createMD(sys.argv[2], sys.argv[3], sys.argv[4],ubicaciones)
-            serializationL(ubiMovPickle, ubicaciones)
-            print("La ubicacion ha sido agregada.")
+            if sys.argv[3][0] == "<":
+                ubicaciones = createMD(sys.argv[2], sys.argv[3], sys.argv[4],ubicaciones)
+                serializationL(ubiMovPickle, ubicaciones)
+                print("La ubicacion ha sido agregada.")
+            else:
+                print("Parametro no permitido")
+                print("CREACIÓN DE DIRECCION FALLIDA")
     except IOError:
         print("Parametro no permitido")
         print("CREACIÓN DE DIRECCION FALLIDA")
