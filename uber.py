@@ -143,7 +143,7 @@ def createMD(nombre, direccion, monto, hash):
     return hash
 
 # Dijkstra Uber
-def searchKeyIncList(v, key):
+def searchKeyIncList(v, key): # Busca en la lista si existe el nodo con key ingresada
     for list in v.inclist: 
         try:
             if isinstance(list.index(key,0,1), int):
@@ -183,7 +183,7 @@ def dijkstra(G, snode):
                 relax(u, vnode)
 
 # Choose vertex
-def searchKeyAdjList(v, key):
+def searchKeyAdjList(v, key): # Busca en la lista de adjacencia si existe el nodo con la key ingresada y devuelve valor logico
     for list in v.adjlist: 
         try:
             if isinstance(list.index(key,0,1), int):
@@ -225,7 +225,7 @@ def chooseVertex(G, value, variant): # variant debe ser 0 para llegada o 1 para 
         else:
             return useV
 
-def calculatePrice(persona,autos,ubiM):
+def calculatePrice(persona,autos,ubiM): # Calcula el precio de los autos hacia la persona
     persona = search(ubiM, persona)
     for node in autos:
         if (search(ubiM,node[0]).monto+node[1])/4 > persona.monto:
@@ -241,7 +241,7 @@ def decision(rank,var):
                 return choose, var
     return decision(rank, var)
 
-def interface(persona, direccion, ranking, ubiF, ubiM):
+def interface(persona, direccion, ranking, ubiF, ubiM): # Interfaz con la que interactua el usuario usuario
     var = 0
     print("-------------------- * --------------------\n")
     print(f"---------- Bienvenido {persona}. ----------\n")
